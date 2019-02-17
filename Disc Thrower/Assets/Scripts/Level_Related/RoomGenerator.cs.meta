@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: ef8f747e8c383214095a08a4974c514b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - roomPrefab: {fileID: 1126165381203188, guid: a81c9801db28e3b4a88cb85afe36a4f2,
+      type: 2}
+  - corridorStraightShort: {fileID: 1247779405133556, guid: 43a2ad15eae5c0a44828ad77939dbaba,
+      type: 2}
+  - corridorStraightLong: {fileID: 1247779405133556, guid: 3ff04661686ccd642956a060f6ed9874,
+      type: 2}
+  - corridorBend: {fileID: 1684472135960800, guid: 21d8319e370827746bf2718694cabfaa,
+      type: 2}
+  - doorPrefab: {fileID: 1726200573102986, guid: dfa129d2fc3fcbe4dac872e7a6a13d60,
+      type: 2}
+  - chestPrefab: {fileID: 1699335946909652, guid: 77ba8d467cf43574095b87b364fcb837,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

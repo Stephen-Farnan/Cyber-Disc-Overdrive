@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Disc
+  - Enemy
+  - Enemy_Projectile
+  - Environment
+  - Score_Text
+  - Challenge_Room
+  - Augments
+  - Shield
+  - Laser_Boss_Second_Part
+  - Laser_Boss_First_Part
+  - Laser_Boss_Main_Part
+  - Lasers
+  - Fade
+  - Laser_Boss
+  - Laser_1
+  - Laser_Pos
+  - Boss_Room
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - PostProcessing
+  - Mouse Hit
+  - Player
+  - Safe
+  - Enemy
+  - Enemy_Projectile
+  - Environment
+  - PP
+  - Minimap
+  - Augments
+  - Shield
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
