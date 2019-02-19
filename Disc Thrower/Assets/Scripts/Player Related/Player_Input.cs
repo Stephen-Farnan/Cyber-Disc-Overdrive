@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player_Input : MonoBehaviour
@@ -7,7 +6,7 @@ public class Player_Input : MonoBehaviour
     public CharacterNavMeshMovement local_CharacterNavMeshMovement;
     public MouseShooting local_MouseShooting;
     public Pause_Manager local_Pause_manager;
-	public CharacterAnimationHandler charAnimHandler;
+    public CharacterAnimationHandler charAnimHandler;
     public Player_Abilities local_Player_Abilities;
     private Vector2 input;
     private Vector2 input2;
@@ -23,7 +22,7 @@ public class Player_Input : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-  
+
         if (input_Enabled)
         {
             Check_For_Input();
@@ -50,110 +49,119 @@ public class Player_Input : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Listens for any input from the player
+    /// </summary>
     void Check_For_Input()
     {
-		//waits until the player presses any key so that checks and input axis are not set every frame
-		if (Input.anyKey || local_CharacterNavMeshMovement.usingController)
-		{
-			//check the player is allowed to enter input
+        //waits until the player presses any key so that checks and input axis are not set every frame
+        if (Input.anyKey || local_CharacterNavMeshMovement.usingController)
+        {
+            //check the player is allowed to enter input
 
-			if (can_Move)
-			{
-				//movement check and set axis
-				input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            if (can_Move)
+            {
+                //movement check and set axis
+                input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-				//controller right stick axes
-				input2 = new Vector2(Input.GetAxis("Horizontal2"), Input.GetAxis("Vertical2"));
+                //controller right stick axes
+                input2 = new Vector2(Input.GetAxis("Horizontal2"), Input.GetAxis("Vertical2"));
 
-				charAnimHandler.UpdateAnimationParameters(input);
+                charAnimHandler.UpdateAnimationParameters(input);
 
-				if (input.x != 0 || input.y != 0)
-				{
-					//move here
-					local_CharacterNavMeshMovement.Move(input.x, input.y);
-				}
+                if (input.x != 0 || input.y != 0)
+                {
+                    //move here
+                    local_CharacterNavMeshMovement.Move(input.x, input.y);
+                }
 
-				if (input.x == 0 && input.y == 0)
-				{
-					//stop moving
-					local_CharacterNavMeshMovement.speed = 0;
-				}
+                if (input.x == 0 && input.y == 0)
+                {
+                    //stop moving
+                    local_CharacterNavMeshMovement.speed = 0;
+                }
 
 
-				if (input2.x != 0 || input2.y != 0)
-				{
-					//rotating
-					local_CharacterNavMeshMovement.RotateCharacter(input2.x, input2.y);
-				}
+                if (input2.x != 0 || input2.y != 0)
+                {
+                    //rotating
+                    local_CharacterNavMeshMovement.RotateCharacter(input2.x, input2.y);
+                }
 
-				//dash check
-				if (Input.GetButtonDown("Jump"))
-				{
-					//dash here
-					local_CharacterNavMeshMovement.Dash(input.x, input.y);
-				}
+                //dash check
+                if (Input.GetButtonDown("Jump"))
+                {
+                    //dash here
+                    local_CharacterNavMeshMovement.Dash(input.x, input.y);
+                }
 
-				//Hoverboard Check
-				if (Input.GetButtonDown("Fire3"))
-				{
-					local_CharacterNavMeshMovement.ToggleHoverboard();
-					StartCoroutine(local_CharacterNavMeshMovement.HoverboardToggleCooldown());
-				}
-			}
+                //Hoverboard Check
+                if (Input.GetButtonDown("Fire3"))
+                {
+                    local_CharacterNavMeshMovement.ToggleHoverboard();
+                    StartCoroutine(local_CharacterNavMeshMovement.HoverboardToggleCooldown());
+                }
+            }
 
-			if (Input.GetButtonDown("Fire1"))
-			{
-				//call parry
-				local_MouseShooting.StartParry();
-			}
+            if (Input.GetButtonDown("Fire1"))
+            {
+                //call parry
+                local_MouseShooting.StartParry();
+            }
 
-			if (!local_CharacterNavMeshMovement.usingController)
-			{
-				if (Input.GetButtonDown("Fire2"))
-				{
-					//call thrower/catch
-					local_MouseShooting.ThrowCatch();
-				}
-			}
-			else
-			{
-				if (Input.GetAxis("Fire2") < 0 && rTDown == false)
-				{
-					//call thrower/catch
-					local_MouseShooting.ThrowCatch();
-					rTDown = true;
-				}
-			}
+            if (!local_CharacterNavMeshMovement.usingController)
+            {
+                if (Input.GetButtonDown("Fire2"))
+                {
+                    //call thrower/catch
+                    local_MouseShooting.ThrowCatch();
+                }
+            }
+            else
+            {
+                if (Input.GetAxis("Fire2") < 0 && rTDown == false)
+                {
+                    //call thrower/catch
+                    local_MouseShooting.ThrowCatch();
+                    rTDown = true;
+                }
+            }
 
-			if (Input.GetButtonDown("Fire4"))
-			{
-				//call player ability
-				local_Player_Abilities.local_Ability_Type = Player_Abilities.Ability_Type.DISC_EXPLOSION;
-				local_Player_Abilities.Cast_Player_Ability();
-			}
+            if (Input.GetButtonDown("Fire4"))
+            {
+                //call player ability
+                local_Player_Abilities.local_Ability_Type = Player_Abilities.Ability_Type.DISC_EXPLOSION;
+                local_Player_Abilities.Cast_Player_Ability();
+            }
 
-			if (Input.GetButtonDown("Fire5"))
-			{
-				//call player ability
-				local_Player_Abilities.local_Ability_Type = Player_Abilities.Ability_Type.DISC_STOPPER;
-				local_Player_Abilities.Cast_Player_Ability();
-			}
-		}
-		else {
-			if (charAnimHandler.CheckParameters() > 0)
-			{
-				charAnimHandler.ZeroOutParameters();
-			}
-		}
+            if (Input.GetButtonDown("Fire5"))
+            {
+                //call player ability
+                local_Player_Abilities.local_Ability_Type = Player_Abilities.Ability_Type.DISC_STOPPER;
+                local_Player_Abilities.Cast_Player_Ability();
+            }
+        }
+        else
+        {
+            if (charAnimHandler.CheckParameters() > 0)
+            {
+                charAnimHandler.ZeroOutParameters();
+            }
+        }
     }
 
-    public void End_Stun_Public( float t, Enemy_Attack_Crowd_Control enemy_Cc)
+    /// <summary>
+    /// Called when the player is stunned, to remove the stun over time
+    /// </summary>
+    /// <param name="t"></param>
+    /// <param name="enemy_Cc">The duration of the stun</param>
+    public void End_Stun_Public(float t, Enemy_Attack_Crowd_Control enemy_Cc)
     {
         curr_Stun_Duration = t;
-        StartCoroutine("End_Stun" , enemy_Cc);
+        StartCoroutine("End_Stun", enemy_Cc);
     }
 
-     IEnumerator End_Stun( Enemy_Attack_Crowd_Control enemy_Attack_Crowd_Control)
+    IEnumerator End_Stun(Enemy_Attack_Crowd_Control enemy_Attack_Crowd_Control)
     {
         yield return new WaitForSeconds(curr_Stun_Duration);
         input_Enabled = true;

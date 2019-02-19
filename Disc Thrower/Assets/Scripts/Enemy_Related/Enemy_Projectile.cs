@@ -1,10 +1,10 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_Projectile : MonoBehaviour {
+public class Enemy_Projectile : MonoBehaviour
+{
 
-   public int damage = 1;
+    public int damage = 1;
     public float projectile_Speed;
     Rigidbody rb;
 
@@ -13,6 +13,11 @@ public class Enemy_Projectile : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
     }
 
+    /// <summary>
+    /// Moves the gameobject this is attached to towards a given target
+    /// </summary>
+    /// <param name="target">destination to move towards over time</param>
+    /// <returns></returns>
     IEnumerator Move_Towards_Target(Transform target)
     {
         Vector3 temp_Dir;
@@ -27,9 +32,13 @@ public class Enemy_Projectile : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Deals with collision with player or environment
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player")
         {
             other.gameObject.GetComponent<CharacterNavMeshMovement>().TakeDamage(transform, damage);
             StopAllCoroutines();

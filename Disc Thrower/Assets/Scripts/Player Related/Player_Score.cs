@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class Player_Score : MonoBehaviour {
+public class Player_Score : MonoBehaviour
+{
 
-	public enum Current_Level
+    public enum Current_Level
     {
         LEVEL_ONE,
         LEVEL_TWO,
@@ -18,7 +17,7 @@ public class Player_Score : MonoBehaviour {
     }
 
     public Current_Level local_Current_Level;
-    
+
 
     [Range(0, 10)]
     public int max_Multiplier = 5;
@@ -59,7 +58,7 @@ public class Player_Score : MonoBehaviour {
     public void Add_To_Multiplier()
     {
         current_Multiplier++;
-        if(current_Multiplier > max_Multiplier)
+        if (current_Multiplier > max_Multiplier)
         {
             current_Multiplier = max_Multiplier;
         }

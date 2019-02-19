@@ -20,6 +20,9 @@ public class Player_Abilities : MonoBehaviour
 
     public Ability_Type local_Ability_Type;
 
+    /// <summary>
+    /// Casts the currently selected player ability
+    /// </summary>
     public void Cast_Player_Ability()
     {
         if (Can_Cast_Ability && local_Mouse_Shooting.projectileFired)
@@ -47,6 +50,9 @@ public class Player_Abilities : MonoBehaviour
         Can_Cast_Ability = true;
     }
 
+    /// <summary>
+    /// Sets the explosion trigger active and deals damage to all enemies in the radius
+    /// </summary>
     void Disc_Explosion_Ability()
     {
         Explosion_Radius_Col.gameObject.SetActive(true);

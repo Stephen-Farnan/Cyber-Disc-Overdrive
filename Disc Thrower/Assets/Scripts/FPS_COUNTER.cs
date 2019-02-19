@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class FPS_COUNTER : MonoBehaviour
 {
+    /// <summary>
+    /// This class simply outputs a more accurate fps reading than unitys default reading
+    /// </summary>
 
     #region variables
     [HideInInspector]
     public float deltaTime = 0.0f;
     #endregion
 
-void Start(){
+    void Start()
+    {
 
-    
-}
+
+    }
 
     void Update()
     {

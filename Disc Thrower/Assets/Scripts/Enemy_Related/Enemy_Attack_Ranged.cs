@@ -18,13 +18,15 @@ public class Enemy_Attack_Ranged : MonoBehaviour {
     private LayerMask ignore_Layers;
 
 
+    /// <summary>
+    /// Sends out a raycast to identify the player. If in range and in sight then fires projectiles at their current position
+    /// </summary>
     public void Shoot_At_Player()
     {
 
         RaycastHit p_Hit;
         if (Physics.Raycast(transform.position, local_Enemy_AI.player_Position.transform.position - transform.position, out p_Hit, Mathf.Infinity, ignore_Layers))
         {
-            //Debug.Log(p_Hit.collider.gameObject);
             if (p_Hit.collider.gameObject.layer == 14)
             {
                 local_Enemy_AI.enemy_State = Enemy_AI.State.PICKING_LOCATION_TO_MOVE;
@@ -34,11 +36,6 @@ public class Enemy_Attack_Ranged : MonoBehaviour {
             {
                 shooting = true;
                 StartCoroutine("Turn_To_Face_Enemy");
-                //instantiate bullets at enemy location
-
-                // float temp_Y = transform.rotation.y;
-                //   transform.LookAt(local_Enemy_AI.player_Position.transform);
-                //  transform.localEulerAngles = new Vector3(transform.rotation.x, temp_Y, transform.rotation.z);
 
                 StartCoroutine("Wait_Between_Bullets");
 
@@ -48,6 +45,10 @@ public class Enemy_Attack_Ranged : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Ensures the enemy is always accurately facing the player before firing
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Turn_To_Face_Enemy()
     {
 
@@ -62,6 +63,10 @@ public class Enemy_Attack_Ranged : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Pauses firing between shots based on the enemy attack speed
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Wait_Between_Bullets()
     {
         yield return new WaitForSeconds(.25f);

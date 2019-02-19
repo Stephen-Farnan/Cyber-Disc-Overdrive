@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 
 public class Player_Augments : MonoBehaviour
 {
-
+    #region properties
     public CharacterNavMeshMovement local_CharacterNavMeshMovement;
     public NavMeshAgent local_Nav_Agent;
     public HealthScript local_HealthScript;
@@ -23,7 +21,12 @@ public class Player_Augments : MonoBehaviour
     }
 
     public Player_Augments_List local_Player_Augments_List;
+    #endregion
 
+    /// <summary>
+    /// Adds specified augment to the player
+    /// </summary>
+    /// <param name="selected_Augment">Augment to add to the player</param>
     public void Add_Augment_To_Player(Player_Augments_List selected_Augment)
     {
         switch (selected_Augment)
@@ -53,13 +56,10 @@ public class Player_Augments : MonoBehaviour
     {
         local_CharacterNavMeshMovement.targetSpeed += moveSpeed_Increase_Amount;
         local_Nav_Agent.speed += moveSpeed_Increase_Amount;
-        Debug.Log("added speed");
     }
 
     void Add_Increase_Health()
     {
-
-
 
         if (local_HealthScript.currentHealth < local_HealthScript.maxHealth)
         {
@@ -68,12 +68,8 @@ public class Player_Augments : MonoBehaviour
 
         else
         {
-            //Increase max health here
             local_HealthScript.maxHealth++;
             local_HealthScript.RegainHealth(health_Regain_Amount);
         }
-        Debug.Log("added health");
-
-
     }
 }

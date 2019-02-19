@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Multi_Disc_Boss_Manager : MonoBehaviour {
+public class Multi_Disc_Boss_Manager : MonoBehaviour
+{
 
     public bool all_Discs_Are_Destroyed = false;
     public float wait_Time_To_Reset_Discs = 5f;
@@ -15,10 +15,11 @@ public class Multi_Disc_Boss_Manager : MonoBehaviour {
     public HealthScript local_Healthscript;
 
 
+    /// <summary>
+    /// check all the discs have been destroyed, if they have, fire them out again in a certain pattern
+    /// </summary>
     public void Attack()
     {
-        //check all the discs have been destroyed, if they have, fire them out again in a certain pattern. Attack will have 3 different patterns
-        //has one attack where it stops all discs mid air, and makes them move in random direction (maybe try this later)
         if (all_Discs_Are_Destroyed)
         {
             //start attack phase coroutine, then alter the state in Enemy AI
@@ -33,6 +34,10 @@ public class Multi_Disc_Boss_Manager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Recast the discs again once the player has destroyed the current ones
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator Reset_Discs()
     {
         yield return new WaitForSeconds(wait_Time_To_Reset_Discs);
@@ -40,10 +45,14 @@ public class Multi_Disc_Boss_Manager : MonoBehaviour {
         curr_Number_Of_Discs = max_Number_Of_Discs;
     }
 
+    /// <summary>
+    /// Fire out all of the discs avaialble to the boss and set them as active for collisions
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator Fire_Discs()
     {
         int remaining_Discs = max_Number_Of_Discs;
-        while(remaining_Discs > 0)
+        while (remaining_Discs > 0)
         {
             //turn on a disc
             all_Discs_Are_Destroyed = false;
@@ -59,17 +68,12 @@ public class Multi_Disc_Boss_Manager : MonoBehaviour {
     }
 
 
+    /// <summary>
+    /// Handles taking damage from the player
+    /// </summary>
+    /// <param name="amount">The amount of damage to be taken</param>
     public void Take_Damage(int amount)
     {
         local_Healthscript.LoseHealth(amount);
     }
-
-
-
-    //calls back to the enemy Ai class to set its state after attacking
-    //  local_Enemy_AI.enemy_State = Enemy_AI.State.RESTING;
-    //  local_Enemy_AI.StartCoroutine("Rest", local_Enemy_AI.rest_Duration);
-
-    // local_Enemy_Ai.enemy_State = Enemy_AI.State.PICKING_LOCATION_TO_MOVE;
-    // local_Enemy_Ai.StartCoroutine("Pick_Move_Location");
 }

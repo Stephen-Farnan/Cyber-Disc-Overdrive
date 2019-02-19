@@ -1,13 +1,12 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Laser_Boss_AI : MonoBehaviour
 {
-
+    #region properties
     public enum Grid_Position
     {
         A1, A2, A3, A4, A5,
@@ -96,7 +95,6 @@ public class Laser_Boss_AI : MonoBehaviour
     bool second_Stopped = true;
 
     bool attacking = false;
-    //public float spin_Duration = 2f;
     public float attack_Delay = 2f;
     public float spin_Speed = 10f;
     public float speed_Increase = 5f;
@@ -116,7 +114,6 @@ public class Laser_Boss_AI : MonoBehaviour
     float current_Lerp_Time = 0f;
     public float lerp_Time = 1f;
 
-
     Quaternion target_Rotation_a;
     Quaternion target_Rotation_b;
     Quaternion target_Rotation_c;
@@ -132,6 +129,7 @@ public class Laser_Boss_AI : MonoBehaviour
     public GameObject disc;
     public GameObject Score;
 
+    #endregion
 
 
     private void Update()
@@ -174,15 +172,8 @@ public class Laser_Boss_AI : MonoBehaviour
                 second_Part_Gameobject.transform.position = new_Pos;
             }
 
-            // main_Boss_Gameobject.transform.Rotate(Vector3.up * 30f);
-
             if (attacking)
             {
-
-
-                //main_Boss_Gameobject.transform.Rotate(Vector3.forward * Time.deltaTime * 100f *rand_dir_a , Space.Self);
-                //first_Part_Gameobject.transform.Rotate(Vector3.forward * Time.deltaTime * 100f *rand_dir_b, Space.Self);
-                //second_Part_Gameobject.transform.Rotate(Vector3.forward * Time.deltaTime * 100f *rand_dir_c, Space.Self);
                 current_Lerp_Time += Time.deltaTime;
                 if (current_Lerp_Time > lerp_Time)
                 {
@@ -202,7 +193,6 @@ public class Laser_Boss_AI : MonoBehaviour
                 if (second_Part_Alive)
                 {
                     second_Part_Gameobject.transform.rotation = Quaternion.Lerp(second_Part_Gameobject.transform.rotation, target_Rotation_c, t);
-
                 }
 
                 if (current_Lerp_Time >= 3f)
@@ -211,16 +201,15 @@ public class Laser_Boss_AI : MonoBehaviour
                     attacking = false;
                 }
 
-
             }
         }
-        
- 
-
     }
 
-
-
+    /// <summary>
+    /// Deals damage to the relevant part hit
+    /// </summary>
+    /// <param name="amount">How much damage to deal</param>
+    /// <param name="part_Hit">Which part to take the damage</param>
     public void Take_Damage(int amount, int part_Hit)
     {
         if (!invulnerable)
@@ -231,8 +220,6 @@ public class Laser_Boss_AI : MonoBehaviour
             {
                 StartCoroutine(Handle_Death());
             }
-
-
 
             switch (part_Hit)
             {
@@ -268,16 +255,22 @@ public class Laser_Boss_AI : MonoBehaviour
             StartCoroutine(Invulnerability_Cooldown());
 
         }
-
-
     }
 
+    /// <summary>
+    /// Turns off Invulernability after a set amount of time
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator Invulnerability_Cooldown()
     {
         yield return new WaitForSeconds(invulnerability_Duration);
         invulnerable = false;
     }
 
+    /// <summary>
+    /// Disables Boss Components and ends the current level
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator Handle_Death()
     {
         local_Player_Input.input_Enabled = false;
@@ -295,6 +288,9 @@ public class Laser_Boss_AI : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
+    /// <summary>
+    /// Randomly sets the rotation direction of each boss laser section for the next attack
+    /// </summary>
     public void Attack_Loop()
     {
         if (!attacking)
@@ -354,25 +350,12 @@ public class Laser_Boss_AI : MonoBehaviour
 
             attacking = true;
         }
-
-               
-
-
-            
-
-
-
-        
     }
 
-    // public IEnumerator start_Attacking()
-    //  {
-    //  attacking = true;
-    //   yield return new WaitForSeconds(spin_Duration);
-    //  attacking = false;
-
-    //  }
-
+    /// <summary>
+    /// After a short delay starts a new attack
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator start_New_Attack()
     {
         while (true)
@@ -380,9 +363,13 @@ public class Laser_Boss_AI : MonoBehaviour
             yield return new WaitForSeconds(attack_Delay);
             Attack_Loop();
         }
-
     }
 
+    /// <summary>
+    /// After a short delay sets the specified part to rest and after a delay allows it to be move or attack agaiin on the next cycle
+    /// </summary>
+    /// <param name="part_Number">Identifies whcih boss part to rest</param>
+    /// <returns></returns>
     public IEnumerator Rest(int part_Number)
     {
         yield return new WaitForSeconds(rest_Duration);
@@ -391,7 +378,7 @@ public class Laser_Boss_AI : MonoBehaviour
         {
             case 0:
                 Update_Current_Pos(ref Main_Boss_Position, ref Main_Boss_Target_Position);
-                Update_Target_Location(ref Main_Boss_Position, ref Main_Boss_Target_Position, main_Boss_Nav_Agent,0);
+                Update_Target_Location(ref Main_Boss_Position, ref Main_Boss_Target_Position, main_Boss_Nav_Agent, 0);
 
                 yield return new WaitForSeconds(.5f);
                 main_can_update = true;
@@ -399,7 +386,7 @@ public class Laser_Boss_AI : MonoBehaviour
 
             case 1:
                 Update_Current_Pos(ref first_Part_Position, ref first_Part_Target_Position);
-                Update_Target_Location(ref first_Part_Position, ref first_Part_Target_Position, first_Part_Nav_Agent,1);
+                Update_Target_Location(ref first_Part_Position, ref first_Part_Target_Position, first_Part_Nav_Agent, 1);
 
                 yield return new WaitForSeconds(.5f);
                 first_can_update = true;
@@ -407,25 +394,24 @@ public class Laser_Boss_AI : MonoBehaviour
 
             case 2:
                 Update_Current_Pos(ref second_Part_Position, ref second_Part_Target_Position);
-                Update_Target_Location(ref second_Part_Position, ref second_Part_Target_Position, second_Part_Nav_Agent,2);
+                Update_Target_Location(ref second_Part_Position, ref second_Part_Target_Position, second_Part_Nav_Agent, 2);
 
                 yield return new WaitForSeconds(.5f);
                 second_can_update = true;
                 break;
         }
-
-
-
     }
 
-    
+
     private void Start()
     {
-
-
         StartCoroutine(Wake());
     }
 
+    /// <summary>
+    /// Initialises variables and sets each part with a valid position to move to
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Wake()
     {
         yield return new WaitForSeconds(1.5f);
@@ -446,7 +432,7 @@ public class Laser_Boss_AI : MonoBehaviour
         target_Rotation_c = second_Part_Gameobject.transform.rotation;
         StartCoroutine(start_New_Attack());
         is_Awake = true;
-        
+
     }
 
     int rand_Num = 0;
@@ -478,15 +464,16 @@ public class Laser_Boss_AI : MonoBehaviour
 
     void Rotate_Part(GameObject go)
     {
-        //rotate a part  transform.Rotate(Vector3.up * Time.deltaTime, Space.World);
-
-            main_Boss_Gameobject.transform.Rotate(Vector3.up * Time.deltaTime);
-        
-        
+        main_Boss_Gameobject.transform.Rotate(Vector3.up * Time.deltaTime);
     }
 
-
-
+    /// <summary>
+    /// Chooses random target locations until a valid free spot is found for the specified part
+    /// </summary>
+    /// <param name="g_Pos">Current grid position of the part specified</param>
+    /// <param name="g_Targ_Pos">Target position on the grid to be set as new destination</param>
+    /// <param name="nav_Agent">Nav agent of the specified part</param>
+    /// <param name="section_Number">Which boss gameobject is being specified</param>
     void Update_Target_Location(ref Grid_Position g_Pos, ref Grid_Position g_Targ_Pos, NavMeshAgent nav_Agent, int section_Number)
     {
         switch (g_Pos)
@@ -517,9 +504,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -559,9 +543,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -600,9 +581,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -641,9 +619,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -674,9 +649,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -712,15 +684,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -767,14 +733,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -818,13 +779,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -868,14 +825,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -910,14 +862,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -952,14 +899,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
-
                     default:
                         //do nothing
                         break;
-
-
 
                 }
                 break;
@@ -1009,9 +951,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1054,15 +993,9 @@ public class Laser_Boss_AI : MonoBehaviour
                             nav_Agent.SetDestination(location_D3.position);
                         }
                         break;
-
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1106,14 +1039,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1149,14 +1077,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1192,14 +1115,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1242,15 +1160,9 @@ public class Laser_Boss_AI : MonoBehaviour
                             nav_Agent.SetDestination(location_E2.position);
                         }
                         break;
-
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1294,14 +1206,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1345,14 +1252,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1390,7 +1292,6 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
                 }
                 break;
 
@@ -1416,14 +1317,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1458,15 +1354,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1501,15 +1391,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1544,15 +1428,9 @@ public class Laser_Boss_AI : MonoBehaviour
                         }
                         break;
 
-
-
-
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
 
@@ -1581,14 +1459,11 @@ public class Laser_Boss_AI : MonoBehaviour
                     default:
                         //do nothing
                         break;
-
-
-
                 }
                 break;
         }
 
-        if(g_Pos != g_Targ_Pos)
+        if (g_Pos != g_Targ_Pos)
         {
             switch (section_Number)
             {
@@ -1608,6 +1483,11 @@ public class Laser_Boss_AI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates which grid positions are free after moving
+    /// </summary>
+    /// <param name="g_Pos">The position the object moved from to be set as free</param>
+    /// <param name="g_Targ_Position">The new target position to be set as occupied</param>
     void Update_Current_Pos(ref Grid_Position g_Pos, ref Grid_Position g_Targ_Position)
     {
 
@@ -1815,10 +1695,7 @@ public class Laser_Boss_AI : MonoBehaviour
             case Grid_Position.E5:
                 g_Pos = Grid_Position.E5;
                 break;
-
         }
-
-
 
     }
 }

@@ -1,37 +1,41 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
-public class HealthScript : MonoBehaviour {
+/// <summary>
+/// This component script handles health management on whatever gameobject it is attached to
+/// </summary>
 
-	public float maxHealth;
-	public int currentHealth;
-	public float invulnerabilityTime;
-	public float enemyFlashSpeed = 1;
-	public float enemyFlashTime = 2;
-	private bool isInvulnerable = false;
+public class HealthScript : MonoBehaviour
+{
 
-	[Header("Audio")]
-	private AudioSource audioSource;
+    public float maxHealth;
+    public int currentHealth;
+    public float invulnerabilityTime;
+    public float enemyFlashSpeed = 1;
+    public float enemyFlashTime = 2;
+    private bool isInvulnerable = false;
+
+    [Header("Audio")]
+    private AudioSource audioSource;
     public AudioSource damage_SFX;
-	[Tooltip("0: Hit, 1: Death")]
-	public AudioClip[] audioClips;
+    [Tooltip("0: Hit, 1: Death")]
+    public AudioClip[] audioClips;
     public Death_Manager local_Death_Manager;
-	private Material mat;
-	private Coroutine damageCoroutine;
+    private Material mat;
+    private Coroutine damageCoroutine;
 
 
-	void Awake () {
-		audioSource = GetComponent<AudioSource>();
-		if (gameObject.tag == "Enemy")
-		{
-			mat = GetComponentsInChildren<MeshRenderer>()[1].material;
-		}
-	}
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (gameObject.tag == "Enemy")
+        {
+            mat = GetComponentsInChildren<MeshRenderer>()[1].material;
+        }
+    }
 
-	//Attempting to get octagonal colliders working
-	/*
+    //Attempting to get octagonal colliders working
+    /*
 	void OnCollisionEnter(Collision col)
 	{
 		if (col.collider.tag == "Disc")
@@ -54,7 +58,7 @@ public class HealthScript : MonoBehaviour {
 		}
 	}*/
 
-	public void LoseHealth(int damage)
+    public void LoseHealth(int damage)
     {
         if (gameObject.tag == "Player")
         {
@@ -64,103 +68,119 @@ public class HealthScript : MonoBehaviour {
             }
 
         }
-            if (isInvulnerable)
-		{
-			return;
-		}
+        if (isInvulnerable)
+        {
+            return;
+        }
 
         //isInvulnerable = true;
-		currentHealth -= damage;
-		PlayAudioClip(0);
-        if(damage_SFX != null)
+        currentHealth -= damage;
+        PlayAudioClip(0);
+        if (damage_SFX != null)
         {
             damage_SFX.Play();
         }
 
         if (currentHealth <= 0)
-		{
-			Die();
-			return;
-		}
+        {
+            Die();
+            return;
+        }
 
-		//If this script is attached to the player character, enable invulnerability
-		if (gameObject.tag == "Player")
-		{
+        //If this script is attached to the player character, enable invulnerability
+        if (gameObject.tag == "Player")
+        {
             StartCoroutine(GetComponent<PlayerStatus>().MakeInvulnerable(invulnerabilityTime));
-                gameObject.GetComponent<Player_Score>().Reset_Mutliplier();
-                gameObject.GetComponent<Player_UI>().Update_Health(currentHealth);
+            gameObject.GetComponent<Player_Score>().Reset_Mutliplier();
+            gameObject.GetComponent<Player_UI>().Update_Health(currentHealth);
 
         }
 
-		if (gameObject.tag == "Enemy")
-		{
-			isInvulnerable = true;
-			if (damageCoroutine != null) StopCoroutine(damageCoroutine);
-			damageCoroutine = StartCoroutine(DamageFlash());
-			Invoke("EndInvulnerability", invulnerabilityTime);
-		}
-	}
+        if (gameObject.tag == "Enemy")
+        {
+            isInvulnerable = true;
+            if (damageCoroutine != null) StopCoroutine(damageCoroutine);
+            damageCoroutine = StartCoroutine(DamageFlash());
+            Invoke("EndInvulnerability", invulnerabilityTime);
+        }
+    }
 
-	IEnumerator DamageFlash()
-	{
-		float timer = enemyFlashTime;
-		while (timer > 0)
-		{
-			mat.SetFloat("_damageSlider", (Mathf.PingPong(Time.time * enemyFlashSpeed, 1)));
-			timer -= Time.deltaTime;
-			yield return null;
-		}
-		mat.SetFloat("_damageSlider", 0);
-	}
+    /// <summary>
+    /// Visual feedback on damage taken
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DamageFlash()
+    {
+        float timer = enemyFlashTime;
+        while (timer > 0)
+        {
+            mat.SetFloat("_damageSlider", (Mathf.PingPong(Time.time * enemyFlashSpeed, 1)));
+            timer -= Time.deltaTime;
+            yield return null;
+        }
+        mat.SetFloat("_damageSlider", 0);
+    }
 
-	IEnumerator DeathPhaseOut()
-	{
-		float deathTime = 0.5f;
-		float timer = deathTime;
-		while (timer > 0)
-		{
-			mat.SetFloat("_deathSlider", 1 - timer/deathTime);
-			timer -= Time.deltaTime;
-			yield return null;
-		}
-		mat.SetFloat("_deathSlider", 1);
-	}
+    /// <summary>
+    /// Fades enemies out over time after they are killed
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DeathPhaseOut()
+    {
+        float deathTime = 0.5f;
+        float timer = deathTime;
+        while (timer > 0)
+        {
+            mat.SetFloat("_deathSlider", 1 - timer / deathTime);
+            timer -= Time.deltaTime;
+            yield return null;
+        }
+        mat.SetFloat("_deathSlider", 1);
+    }
 
-	void EndInvulnerability() {
-		isInvulnerable = false;
-	}
+    void EndInvulnerability()
+    {
+        isInvulnerable = false;
+    }
 
-	public void RegainHealth(int amount) {
-		if (currentHealth < maxHealth)
-		{
-			currentHealth += amount;
-			if (gameObject.tag == "Player")
-			{
-				gameObject.GetComponent<Player_UI>().Update_Health(currentHealth);
-			}
-		}
-	}
+    /// <summary>
+    /// Increases Health based on passed in amount
+    /// </summary>
+    /// <param name="amount">Amount to increase health by</param>
+    public void RegainHealth(int amount)
+    {
+        if (currentHealth < maxHealth)
+        {
+            currentHealth += amount;
+            if (gameObject.tag == "Player")
+            {
+                gameObject.GetComponent<Player_UI>().Update_Health(currentHealth);
+            }
+        }
+    }
 
-	void Die() {
-		GetComponent<CapsuleCollider>().enabled = false;
-		GetComponent<MeshRenderer>().enabled = false;
-		if (gameObject.tag == "Player")
-		{
-			GetComponent<MouseShooting>().enabled = false;
-			GetComponent<CharacterNavMeshMovement>().enabled = false;
+    void Die()
+    {
+        GetComponent<CapsuleCollider>().enabled = false;
+        GetComponent<MeshRenderer>().enabled = false;
+        if (gameObject.tag == "Player")
+        {
+            GetComponent<MouseShooting>().enabled = false;
+            GetComponent<CharacterNavMeshMovement>().enabled = false;
             local_Death_Manager.StartCoroutine("End_Level");
-		}
-		if (gameObject.tag == "Enemy")
-		{
-			StartCoroutine(DeathPhaseOut());
-			GetComponent<Enemy_AI>().StartCoroutine("Die");
-		}
+        }
+        if (gameObject.tag == "Enemy")
+        {
+            StartCoroutine(DeathPhaseOut());
+            GetComponent<Enemy_AI>().StartCoroutine("Die");
+        }
 
-		PlayAudioClip(1);
-	}
+        PlayAudioClip(1);
+    }
 
-	void PlayAudioClip(int clipNo) {
-		audioSource.clip = audioClips[clipNo];
-		audioSource.Play();
-	}
+    void PlayAudioClip(int clipNo)
+    {
+        audioSource.clip = audioClips[clipNo];
+        audioSource.Play();
+    }
 }

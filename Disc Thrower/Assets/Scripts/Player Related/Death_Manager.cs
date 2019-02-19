@@ -1,12 +1,16 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Death_Manager : MonoBehaviour {
+public class Death_Manager : MonoBehaviour
+{
 
     private float end_Screen_Text_Duration = 2.5f;
     public GameObject end_Screen_Text;
 
+    /// <summary>
+    /// Disables player input and starts to load the next level
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator End_Level()
     {
         end_Screen_Text.SetActive(true);

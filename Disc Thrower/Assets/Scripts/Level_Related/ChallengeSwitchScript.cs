@@ -1,136 +1,147 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ChallengeSwitchScript : MonoBehaviour {
-	public bool recallOnHit = true;
-	public Material activatedMaterial;
-	private Material startMaterial;
-	[Tooltip("Spawner: Is there a key in the chest?, Destroyer: Do the destroyables respawn?, Pressure Plate: Must be set to false")]
-	public bool parameter = false;
-	[Tooltip("If objects can respawn, how long does that take?")]
-	public float timeTilRespawn = 0;
+public class ChallengeSwitchScript : MonoBehaviour
+{
 
-	private bool triggered = false;
-	private string colliderTag;
+    #region properties
+    public bool recallOnHit = true;
+    public Material activatedMaterial;
+    private Material startMaterial;
+    [Tooltip("Spawner: Is there a key in the chest?, Destroyer: Do the destroyables respawn?, Pressure Plate: Must be set to false")]
+    public bool parameter = false;
+    [Tooltip("If objects can respawn, how long does that take?")]
+    public float timeTilRespawn = 0;
 
-	delegate void ChestSpawnDelegate(bool isKey);
-	ChestSpawnDelegate triggerDelegate;
+    private bool triggered = false;
+    private string colliderTag;
 
-	public enum SwitchType {spawner, destroyer, pressurePlate}
-	public SwitchType switchType;
+    delegate void ChestSpawnDelegate(bool isKey);
+    ChestSpawnDelegate triggerDelegate;
 
-	[Space]
-	[Tooltip("GOs to destroy if the switch type is set to 'Destroyer'")]
-	public GameObject[] destroyables;
+    public enum SwitchType { spawner, destroyer, pressurePlate }
+    public SwitchType switchType;
 
-	private AudioSource audSource;
-	public AudioClip[] audioClips;
+    [Space]
+    [Tooltip("GOs to destroy if the switch type is set to 'Destroyer'")]
+    public GameObject[] destroyables;
 
-	void Start() {
-		//Search for the room generator associated with the room this button is in
-		Transform parentTransform = transform.parent.parent.parent.parent;
-		startMaterial = GetComponent<MeshRenderer>().material;
-		audSource = GetComponent<AudioSource>();
+    private AudioSource audSource;
+    public AudioClip[] audioClips;
+    #endregion
 
-		colliderTag = "Disc";
+    void Start()
+    {
+        //Search for the room generator associated with the room this button is in
+        Transform parentTransform = transform.parent.parent.parent.parent;
+        startMaterial = GetComponent<MeshRenderer>().material;
+        audSource = GetComponent<AudioSource>();
 
-		//Setting our loacal delegate to be equal to the desired function
-		switch (switchType)
-		{
-			case SwitchType.spawner:
-				triggerDelegate = parentTransform.GetComponent<RoomGenerator>().SpawnChest;
-				break;
-			case SwitchType.destroyer:
-				triggerDelegate = DeactivateGO;
-				break;
-			case SwitchType.pressurePlate:
-				triggerDelegate = DeactivateGO;
-				colliderTag = "Player";
-				break;
-			default:
-				break;
-		}
+        colliderTag = "Disc";
 
-		triggerDelegate += ActivateSwitch;
-	}
-	
-	void OnCollisionEnter (Collision col) {
-		if (col.collider.tag == colliderTag)
-		{
-			if (!triggered)
-			{
-				triggerDelegate(false);
-			}
-		}
+        //Setting our loacal delegate to be equal to the desired function
+        switch (switchType)
+        {
+            case SwitchType.spawner:
+                triggerDelegate = parentTransform.GetComponent<RoomGenerator>().SpawnChest;
+                break;
+            case SwitchType.destroyer:
+                triggerDelegate = DeactivateGO;
+                break;
+            case SwitchType.pressurePlate:
+                triggerDelegate = DeactivateGO;
+                colliderTag = "Player";
+                break;
+            default:
+                break;
+        }
 
-		if (col.collider.tag == "Disc")
-		{
-			//Recall Disc
-			if(recallOnHit)
-				col.collider.GetComponent<ProjectileCollision>().RecallDisc();
-		}
-	}
+        triggerDelegate += ActivateSwitch;
+    }
 
-	void OnCollisionExit(Collision col) {
-		if (switchType == SwitchType.pressurePlate)
-		{
-			if (col.collider.tag == colliderTag && triggered)
-			{
-				StartCoroutine(RespawnDestroyables());
-				ResetSwitch();
-			}
-		}
-	}
+    void OnCollisionEnter(Collision col)
+    {
+        if (col.collider.tag == colliderTag)
+        {
+            if (!triggered)
+            {
+                triggerDelegate(false);
+            }
+        }
 
-	void DeactivateGO(bool respawn) {
-		for (int i = 0; i < destroyables.Length; i++)
-		{
-			destroyables[i].GetComponent<MeshRenderer>().enabled = false;
-			if (destroyables[i].GetComponent<MeshCollider>() != null)
-			{
-				destroyables[i].GetComponent<MeshCollider>().enabled = false;
-			}
-			else {
-				destroyables[i].GetComponent<BoxCollider>().enabled = false;
-			}
-		}
+        if (col.collider.tag == "Disc")
+        {
+            //Recall Disc
+            if (recallOnHit)
+                col.collider.GetComponent<ProjectileCollision>().RecallDisc();
+        }
+    }
 
-		if (respawn)
-		{
-			StartCoroutine(RespawnDestroyables());
-		}
-	}
+    void OnCollisionExit(Collision col)
+    {
+        if (switchType == SwitchType.pressurePlate)
+        {
+            if (col.collider.tag == colliderTag && triggered)
+            {
+                StartCoroutine(RespawnDestroyables());
+                ResetSwitch();
+            }
+        }
+    }
 
-	IEnumerator RespawnDestroyables() {
-		yield return new WaitForSeconds(timeTilRespawn);
+    void DeactivateGO(bool respawn)
+    {
+        for (int i = 0; i < destroyables.Length; i++)
+        {
+            destroyables[i].GetComponent<MeshRenderer>().enabled = false;
+            if (destroyables[i].GetComponent<MeshCollider>() != null)
+            {
+                destroyables[i].GetComponent<MeshCollider>().enabled = false;
+            }
+            else
+            {
+                destroyables[i].GetComponent<BoxCollider>().enabled = false;
+            }
+        }
 
-		for (int i = 0; i < destroyables.Length; i++)
-		{
-			destroyables[i].GetComponent<MeshRenderer>().enabled = true;
-			if (destroyables[i].GetComponent<MeshCollider>() != null)
-			{
-				destroyables[i].GetComponent<MeshCollider>().enabled = true;
-			}
-			else
-			{
-				destroyables[i].GetComponent<BoxCollider>().enabled = true;
-			}
-		}
-	}
+        if (respawn)
+        {
+            StartCoroutine(RespawnDestroyables());
+        }
+    }
 
-	void ActivateSwitch(bool trigger) {
-		GetComponent<MeshRenderer>().material = activatedMaterial;
-		triggered = true;
-		audSource.clip = audioClips[0];
-		audSource.Play();
-	}
+    IEnumerator RespawnDestroyables()
+    {
+        yield return new WaitForSeconds(timeTilRespawn);
 
-	void ResetSwitch() {
-		triggered = false;
-		GetComponent<MeshRenderer>().material = startMaterial;
+        for (int i = 0; i < destroyables.Length; i++)
+        {
+            destroyables[i].GetComponent<MeshRenderer>().enabled = true;
+            if (destroyables[i].GetComponent<MeshCollider>() != null)
+            {
+                destroyables[i].GetComponent<MeshCollider>().enabled = true;
+            }
+            else
+            {
+                destroyables[i].GetComponent<BoxCollider>().enabled = true;
+            }
+        }
+    }
 
-		audSource.clip = audioClips[0];
-		audSource.Play();
-	}
+    void ActivateSwitch(bool trigger)
+    {
+        GetComponent<MeshRenderer>().material = activatedMaterial;
+        triggered = true;
+        audSource.clip = audioClips[0];
+        audSource.Play();
+    }
+
+    void ResetSwitch()
+    {
+        triggered = false;
+        GetComponent<MeshRenderer>().material = startMaterial;
+
+        audSource.clip = audioClips[0];
+        audSource.Play();
+    }
 }

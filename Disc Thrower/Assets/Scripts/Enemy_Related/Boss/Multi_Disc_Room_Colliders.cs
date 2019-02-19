@@ -7,6 +7,10 @@ public class Multi_Disc_Room_Colliders : MonoBehaviour {
 
     Multi_Disc_Boss_Manager local_Multi_Disc_Boss_Manager;
 
+    /// <summary>
+    /// Handles the colliders in the boss room which destroy discs
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Disc")

@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Pause_Manager : MonoBehaviour {
+public class Pause_Manager : MonoBehaviour
+{
 
     bool game_Is_Paused = false;
     float curr_Timescale;
@@ -12,6 +10,9 @@ public class Pause_Manager : MonoBehaviour {
     public Player_Input local_Player_Input;
     bool input_Was_Paused = false;
 
+    /// <summary>
+    /// When called changes the game state between paused and unpaused
+    /// </summary>
     public void Toggle_Pause()
     {
 

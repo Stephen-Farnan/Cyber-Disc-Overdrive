@@ -1,12 +1,11 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class Enemy_AI : MonoBehaviour
 {
-
+    #region properties
     public float attack_Cooldown = 1f;
     public float rest_Duration = 1.5f;
     public float spawn_Duration = 1f;
@@ -32,7 +31,7 @@ public class Enemy_AI : MonoBehaviour
     public NavMeshAgent self_Navmesh_Agent;
     public AudioSource attack_SFX;
     public GameObject score_Text;
-	public GameObject deathParticle;
+    public GameObject deathParticle;
     public GameObject support_Shield;
     public bool is_Shielded;
     Rigidbody rb;
@@ -47,10 +46,8 @@ public class Enemy_AI : MonoBehaviour
     [SerializeField]
     private LayerMask ignore_Layers;
 
-
-
     [HideInInspector]
-	public RoomScript roomScript;
+    public RoomScript roomScript;
 
     public enum enemy_Type
     {
@@ -77,18 +74,27 @@ public class Enemy_AI : MonoBehaviour
 
     public State enemy_State;
 
+
+    #endregion
+
+    #region methods
+
+    /// <summary>
+    /// Initialization Code
+    /// </summary>
     private void Start()
     {
         StartCoroutine("Check_State");
-		player_Position = GameObject.FindWithTag("Player");
+        player_Position = GameObject.FindWithTag("Player");
         score_Text = GameObject.FindGameObjectWithTag("Score_Text");
         rb = gameObject.GetComponent<Rigidbody>();
         destination_Proximity_Amount = .2f;
 
     }
 
-
-
+    /// <summary>
+    /// check which action state the given enemy is in and chooses next action accordingly
+    /// </summary>
     void Check_State()
     {
 
@@ -133,6 +139,10 @@ public class Enemy_AI : MonoBehaviour
         // yield return new WaitForSeconds(decision_Making_Wait_Time);
     }
 
+    /// <summary>
+    /// Called when enemies are first spawned in level to delay activiy
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Initialise_At_Spawn()
     {
         //play particle effect for spawning in and possibly a startup animation
@@ -144,12 +154,14 @@ public class Enemy_AI : MonoBehaviour
         StartCoroutine(Pick_Move_Location());
     }
 
+    /// <summary>
+    /// Start call to relevant attack function if attack is valid
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Attack()
     {
-        Debug.Log("here");
         if (attack_Available)
         {
-            Debug.Log("attack");
             switch (local_Enemy_Type)
             {
                 case enemy_Type.CHARGER:
@@ -191,22 +203,23 @@ public class Enemy_AI : MonoBehaviour
         {
             StartCoroutine("Pick_Move_Location");
         }
-        
+
     }
 
-
+    /// <summary>
+    /// Chooses next valid destination for enemy to move to
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Pick_Move_Location()
     {
         enemy_State = State.PICKING_LOCATION_TO_MOVE;
         bool found_Valid_Location = false;
-        int layerMask_For_Enemies = ~(1 << 12);
         RaycastHit hit;
-        RaycastHit p_Hit;
+
+
         //calculate valid position to move and set move_Destination to it, then change state
-
-
         while (!found_Valid_Location)
-        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+        {
 
             temp_Rotation_Transform.position = transform.position;
             Vector3 euler = temp_Rotation_Transform.eulerAngles;
@@ -220,61 +233,45 @@ public class Enemy_AI : MonoBehaviour
             //validates the position found
             if (!Physics.Raycast(transform.position, (move_Destination.transform.position - transform.position), out hit, Vector3.Distance(transform.position, move_Destination.transform.position), ignore_Layers))
             {
-           //     if(hit.collider.gameObject.layer != 14)
-               // {
-                    NavMeshHit w_hit;
-                    if (NavMesh.FindClosestEdge(move_Destination.transform.position, out w_hit, NavMesh.AllAreas))
+                NavMeshHit w_hit;
+                if (NavMesh.FindClosestEdge(move_Destination.transform.position, out w_hit, NavMesh.AllAreas))
+                {
+                    if (w_hit.distance > 3f)
                     {
-                        if (w_hit.distance > 3f)
+                        if (Vector3.Distance(player_Position.transform.position, move_Destination.transform.position) < Vector3.Distance(player_Position.transform.position, transform.position))
                         {
-                            if (Vector3.Distance(player_Position.transform.position, move_Destination.transform.position) < Vector3.Distance(player_Position.transform.position, transform.position))
+                            if (!Physics.Raycast(transform.position, (move_Destination.transform.position - transform.position), out hit, Vector3.Distance(transform.position, move_Destination.transform.position) + 2f, ignore_Layers))
                             {
-                                if (!Physics.Raycast(transform.position, (move_Destination.transform.position - transform.position), out hit, Vector3.Distance(transform.position, move_Destination.transform.position) + 2f, ignore_Layers))
-                                {
 
-                                    Debug.Log("1");
-                                    found_Valid_Location = true;
-                                    //Debug.Log(hit.collider.gameObject);
-                                    StartCoroutine("Move_To_Destination");
-                                    break;
-
-
-                                }
-
-
-                                else
-                                {
-                                    Debug.Log("2");
-                                    found_Valid_Location = true;
-                                    //Debug.Log(hit.collider.gameObject);
-                                    StartCoroutine("Move_To_Destination");
-                                    break;
-                                }
-
+                                Debug.Log("1");
+                                found_Valid_Location = true;
+                                StartCoroutine("Move_To_Destination");
+                                break;
                             }
+
+                            else
+                            {
+                                Debug.Log("2");
+                                found_Valid_Location = true;
+                                StartCoroutine("Move_To_Destination");
+                                break;
+                            }
+
                         }
-
                     }
-               // }
-                
-               
+
+                }
             }
-
-
-
             yield return new WaitForSeconds(.02f);
         }
-
-
         is_At_Destination = false;
-
-
-
         StartCoroutine("Check_State");
-
-
     }
 
+    /// <summary>
+    /// Delayed call to stop movement and choose new location to ensure enemy does not get locked into same position
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Movement_Limiter()
     {
         yield return new WaitForSeconds(4f);
@@ -282,16 +279,20 @@ public class Enemy_AI : MonoBehaviour
         StartCoroutine("Pick_Move_Location");
     }
 
+    /// <summary>
+    /// Moves the enemy to the current valid destiation
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Move_To_Destination()
     {
         StartCoroutine("Movement_Limiter");
         self_Navmesh_Agent.speed = movement_Speed;
         enemy_State = State.MOVING;
         moving = true;
-        is_At_Destination = false; 
+        is_At_Destination = false;
         if (self_Navmesh_Agent.isActiveAndEnabled)
         {
- 
+
             self_Navmesh_Agent.SetDestination(move_Destination.transform.position);
             self_Navmesh_Agent.speed = movement_Speed;
             while (!is_At_Destination)
@@ -314,12 +315,18 @@ public class Enemy_AI : MonoBehaviour
             }
 
 
-            
+
         }
 
 
     }
 
+
+
+    /// <summary>
+    /// Called after attacking or moving or during other interruptions
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Rest()
     {
         //stay in rest state for a time
@@ -342,15 +349,15 @@ public class Enemy_AI : MonoBehaviour
                     break;
 
                 case enemy_Type.SUPPORT:
-                    
+
                     break;
 
                 case enemy_Type.CROWD_CONTROL:
-                    
+
                     break;
 
                 case enemy_Type.SPECIALIST:
-                    
+
                     break;
             }
         }
@@ -362,11 +369,14 @@ public class Enemy_AI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles the processing of a dead enemy
+    /// </summary>
     void Despawn_Enemy()
     {
         StopCoroutine("Move_To_Destination");
         GetComponent<NavMeshAgent>().enabled = false;
-        if(roomScript != null) roomScript.EnemyKilled();
+        if (roomScript != null) roomScript.EnemyKilled();
         if (local_Enemy_Type == enemy_Type.CHARGER)
         {
             local_Enemy_Attack_Charger.StopAllCoroutines();
@@ -376,7 +386,7 @@ public class Enemy_AI : MonoBehaviour
             local_Enemy_Attack_Ranged.StopAllCoroutines();
         }
 
-        else if(local_Enemy_Type == enemy_Type.SUPPORT)
+        else if (local_Enemy_Type == enemy_Type.SUPPORT)
         {
 
         }
@@ -398,15 +408,19 @@ public class Enemy_AI : MonoBehaviour
 
         score_Text.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 3.8f, gameObject.transform.position.z);
         score_Text.SetActive(true);
-        //need to redo this properly later
+
         int y = (player_Position.gameObject.GetComponent<Player_Score>().Add_To_Combo_Score(player_Position.gameObject.GetComponent<MouseShooting>().currentParryCombo + 1) * score_Worth * player_Position.gameObject.GetComponent<Player_Score>().current_Multiplier);
         score_Text.gameObject.GetComponent<Text>().text = y.ToString();
         player_Position.gameObject.GetComponent<Player_Score>().Add_To_Combo_Score(y);
         self_Navmesh_Agent.enabled = false;
 
-		Instantiate(deathParticle, transform.position, transform.rotation);
+        Instantiate(deathParticle, transform.position, transform.rotation);
     }
 
+    /// <summary>
+    /// Sends the enemy to be despawned and updates score UI as well as stopping potentially active coroutines
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator Die()
     {
 
@@ -427,18 +441,26 @@ public class Enemy_AI : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Public accessor to request a knockback on the enemy
+    /// </summary>
+    /// <param name="t">Is the direction the force from the knockback is coming from</param>
     public void Knockback(Vector3 t)
     {
 
         StartCoroutine("Wait_For_Knockback", t);
     }
 
+    /// <summary>
+    /// Disables rigidbody components and enables the enemy to be moved back in the opposite direction of the given vector
+    /// </summary>
+    /// <param name="t">Source direction of the incoming force for the knockback</param>
+    /// <returns></returns>
     IEnumerator Wait_For_Knockback(Vector3 t)
     {
         yield return new WaitForSeconds(.005f);
         self_Navmesh_Agent.speed = 0f;
-        //self_Navmesh_Agent.velocity = new Vector3(0,0,0);
-        //self_Navmesh_Agent.enabled = false;
+
 
         rb.constraints = RigidbodyConstraints.None;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
@@ -450,14 +472,20 @@ public class Enemy_AI : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeAll;
     }
 
+    /// <summary>
+    /// Enables Shield Enemy class to turn on shields, and calls a function to turn them off after a delay
+    /// </summary>
     public void Turn_On_Shield_From_Support()
     {
-        //shield is turned on, start coroutine to turn it off
         support_Shield.SetActive(true);
         is_Shielded = true;
         StartCoroutine("Turn_Off_Shield");
     }
 
+    /// <summary>
+    /// Turns off shields after a delay
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Turn_Off_Shield()
     {
         yield return new WaitForSeconds(3f);
@@ -465,9 +493,14 @@ public class Enemy_AI : MonoBehaviour
         is_Shielded = false;
     }
 
+    /// <summary>
+    /// Enables Healer Class Enemies to heal this enemy
+    /// </summary>
     public void Heal_From_Support()
     {
         //turn on healing from support for a couple seconds
         Debug.Log("healed");
     }
+
+    #endregion  
 }

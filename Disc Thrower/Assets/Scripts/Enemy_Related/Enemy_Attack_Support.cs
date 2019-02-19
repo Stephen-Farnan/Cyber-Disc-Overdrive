@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Enemy_Attack_Support : MonoBehaviour
 {
 
-
+    #region properties
     public int number_Of_Shields;
     public Enemy_AI local_Enemy_AI;
 
@@ -16,14 +14,23 @@ public class Enemy_Attack_Support : MonoBehaviour
         HEALER
     }
 
+
+
     public Support_Type local_Support_Type;
 
+    #endregion
+
+    /// <summary>
+    /// Initialize an attack
+    /// </summary>
     public void Attack()
     {
-
         Find_Targets();
     }
 
+    /// <summary>
+    /// Searches for any valid enemies to shield in the level and executes the relevant action on them
+    /// </summary>
     void Find_Targets()
     {
         GameObject[] curr_Enemies;
@@ -62,17 +69,18 @@ public class Enemy_Attack_Support : MonoBehaviour
                                 break;
                         }
                     }
-                    
-
                 }
             }
-
         }
 
         local_Enemy_AI.StartCoroutine("Rest", local_Enemy_AI.rest_Duration);
     }
 
 
+    /// <summary>
+    /// Returns an array of all enemies active in the level
+    /// </summary>
+    /// <returns></returns>
     GameObject[] Get_Curr_Enemies()
     {
         GameObject[] all_Enemies = GameObject.FindGameObjectsWithTag("Enemy");

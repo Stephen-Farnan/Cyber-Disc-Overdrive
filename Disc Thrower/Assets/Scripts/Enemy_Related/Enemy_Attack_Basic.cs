@@ -1,11 +1,14 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_Attack_Basic : MonoBehaviour {
+public class Enemy_Attack_Basic : MonoBehaviour
+{
 
     public Enemy_AI local_Enemy_AI;
 
+    /// <summary>
+    /// Starts the call to move towards the player and sets the new speed
+    /// </summary>
     public void Attack_Player()
     {
         StartCoroutine("Chase_Player");
@@ -14,6 +17,10 @@ public class Enemy_Attack_Basic : MonoBehaviour {
 
 
 
+    /// <summary>
+    /// On collision with the player deal damage
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Player")
@@ -27,6 +34,10 @@ public class Enemy_Attack_Basic : MonoBehaviour {
     }
 
 
+    /// <summary>
+    /// Over time move towards the current player location
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Chase_Player()
     {
         while (true)

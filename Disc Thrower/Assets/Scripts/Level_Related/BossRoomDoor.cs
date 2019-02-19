@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class BossRoomDoor : MonoBehaviour
 {
-	private Transform player;
-	private CameraFollow cam;
-	private MouseShooting shootingScript;
-	private CharacterNavMeshMovement moveScript;
+    private Transform player;
+    private CameraFollow cam;
+    private MouseShooting shootingScript;
+    private CharacterNavMeshMovement moveScript;
     public GameObject boss_GO;
     int random_Num = 0;
 
@@ -19,12 +17,11 @@ public class BossRoomDoor : MonoBehaviour
 
     public Boss_Type boss_Type;
 
-
-
     public GameObject boss_Pos;
 
 
-    private void Start(){
+    private void Start()
+    {
 
         //spawns laser boss
         boss_GO = GameObject.Find("Laser_Boss").gameObject;
@@ -35,7 +32,7 @@ public class BossRoomDoor : MonoBehaviour
         boss_GO.gameObject.SetActive(true);
         random_Num = Random.Range(0, 2);
         random_Num = 1;
-        if(random_Num == 1)
+        if (random_Num == 1)
         {
             boss_Type = Boss_Type.LASER;
         }
@@ -46,41 +43,45 @@ public class BossRoomDoor : MonoBehaviour
 
         }
         player = GameObject.FindWithTag("Player").transform;
-		cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraFollow>();
-		shootingScript = player.GetComponent<MouseShooting>();
-		moveScript = player.GetComponent<CharacterNavMeshMovement>();
- 
-	}
+        cam = GameObject.FindWithTag("MainCamera").GetComponent<CameraFollow>();
+        shootingScript = player.GetComponent<MouseShooting>();
+        moveScript = player.GetComponent<CharacterNavMeshMovement>();
 
-	//When the player gets far enough away from the door, check if they are in a room
-	void OnTriggerExit(Collider col){
-		if (col.tag == "Player"){
-			CheckPlayerIsInRoom();
-		}
-	}
+    }
 
-	void CheckPlayerIsInRoom() {
-		if (player.position.z > transform.position.z)
-		{
-			SealRoom();
-		}
-	}
+    //When the player gets far enough away from the door, check if they are in a room
+    void OnTriggerExit(Collider col)
+    {
+        if (col.tag == "Player")
+        {
+            CheckPlayerIsInRoom();
+        }
+    }
 
-	void SealRoom() {
-		foreach (BoxCollider boxCol in GetComponents<BoxCollider>())
-		{
-			if (boxCol.isTrigger)
-			{
-				boxCol.enabled = false;
-			}
-			else
-			{
-				boxCol.enabled = true;
-			}
-		}
-		GetComponent<MeshRenderer>().enabled = true;
-		GetComponent<NavMeshObstacle>().enabled = true;
-        if(boss_Type == Boss_Type.LASER)
+    void CheckPlayerIsInRoom()
+    {
+        if (player.position.z > transform.position.z)
+        {
+            SealRoom();
+        }
+    }
+
+    void SealRoom()
+    {
+        foreach (BoxCollider boxCol in GetComponents<BoxCollider>())
+        {
+            if (boxCol.isTrigger)
+            {
+                boxCol.enabled = false;
+            }
+            else
+            {
+                boxCol.enabled = true;
+            }
+        }
+        GetComponent<MeshRenderer>().enabled = true;
+        GetComponent<NavMeshObstacle>().enabled = true;
+        if (boss_Type == Boss_Type.LASER)
         {
             //spawns laser boss
             boss_GO = GameObject.Find("Laser_Boss").gameObject;
@@ -98,18 +99,14 @@ public class BossRoomDoor : MonoBehaviour
         {
             //spawns multi disc boss             
         }
-        
-      
-
-
 
         // boss_GO.SetActive(true);
         //Putting Door on Environment layer
         gameObject.layer = 14;
 
-		cam.SetNewTarget(transform, (Vector3.forward * 15f));
+        cam.SetNewTarget(transform, (Vector3.forward * 15f));
 
-		StartCoroutine(shootingScript.Recall());
-		moveScript.LockHover(true);
-	}
-} 
+        StartCoroutine(shootingScript.Recall());
+        moveScript.LockHover(true);
+    }
+}

@@ -1,10 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy_Attack_Crowd_Control : MonoBehaviour
 {
-
+    #region
     public float attack_Duration = 3f;
     public float stun_Duration = 2f;
     bool radius_Is_Growing;
@@ -19,6 +18,7 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
     float outer_Sphere_Radius;
     float particle_Sphere_Radius;
     public float growth_Amount = .2f;
+    #endregion
 
     private void Start()
     {
@@ -27,6 +27,9 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
         particle_Sphere_Radius = local_Particle_System.shape.radius;
     }
 
+    /// <summary>
+    /// Starts an attack and calls the stun radius to start expanding
+    /// </summary>
     public void Attack()
     {
 
@@ -36,6 +39,10 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
         StartCoroutine("Reset_Radius");
     }
 
+    /// <summary>
+    /// Expands the radius of the stun collision to expand over time
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Move_Radius_Out()
     {
         while (radius_Is_Growing)
@@ -54,6 +61,10 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Sets the radius of the stun collision back to its default state
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Reset_Radius()
     {
         yield return new WaitForSeconds(attack_Duration);
@@ -68,14 +79,7 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
         local_Enemy_AI.StartCoroutine("Rest");
 
     }
-/*
-    IEnumerator End_Stun(GameObject player)
-    {
-        yield return new WaitForSeconds(stun_Duration);
-        player.GetComponent<Player_Input>().input_Enabled = true;
-        have_Stunned = false;
-    }
-    */
+
     private void OnTriggerEnter(Collider other)
     {
         outer_Ring_Triggered = true;
@@ -90,7 +94,7 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
                     {
                         have_Stunned = true;
                         other.gameObject.GetComponent<PlayerStatus>().StartStun(stun_Duration);
-                        other.gameObject.GetComponent<Player_Input>().End_Stun_Public( stun_Duration, gameObject.GetComponent<Enemy_Attack_Crowd_Control>());
+                        other.gameObject.GetComponent<Player_Input>().End_Stun_Public(stun_Duration, gameObject.GetComponent<Enemy_Attack_Crowd_Control>());
                     }
                 }
 
@@ -104,7 +108,6 @@ public class Enemy_Attack_Crowd_Control : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-           // can_Stun = false;
             outer_Ring_Triggered = false;
         }
     }
