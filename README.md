@@ -1,2 +1,2 @@
 # Disc-Game
-This is our repo for the Cyber Spin Matrix prototype
+This is our codebase for the Cyber Spin Matrix prototype
