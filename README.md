@@ -1,2 +1,2 @@
-# Disc-Game
-This is our codebase for the Cyber Spin Matrix prototype
+# Cyber Disc Overdrive
+This is our codebase for the Cyber Disc Overdrive prototype
